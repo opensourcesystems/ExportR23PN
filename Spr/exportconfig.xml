@@ -1,12 +1,102 @@
 <?xml version="1.0" ?><root>
-	<dbfschema>
-		<fam>FAM</fam>
-		<im>IM</im>
-		<ot>OT</ot>
-		<dr>DATR</dr>
-	</dbfschema>
 	<connections>
 		<samson db="s11_skibn" ip="127.0.0.1" login="root" password="Qwedsa1!"/>
 		<smo_infis/>
 	</connections>
+    <export_proc>
+        drop procedure if exists `ImportR23PN_proc`;
+        create procedure `ImportR23PN_proc` ()
+        begin
+        CREATE TEMPORARY TABLE IF NOT EXISTS tmp_res (
+        client_id INT(11) NOT NULL
+        , FAM VARCHAR(30) NOT NULL
+        , IM VARCHAR(30) NOT NULL
+        , OT VARCHAR(30) NOT NULL
+        ,DATR VARCHAR(15) NOT NULL
+        ,UCH VARCHAR(10) NOT NULL
+        ,DOM VARCHAR(4) NOT NULL
+        ,KOR VARCHAR(3) NOT NULL
+        ,KV VARCHAR(5) NOT NULL
+        ,KLADRCode VARCHAR(13) NOT NULL
+        ,KLADRStreetCode VARCHAR(17) NOT NULL
+        )ENGINE=MEMORY;
+        TRUNCATE TABLE tmp_res;
+
+        insert into tmp_res
+        SELECT
+        -- count(client.id)
+        client.id,Client.lastName,Client.firstName,Client.patrName,
+        if (Client.birthDate is null,'',DATE_FORMAT(Client.birthDate, '%d.%m.%Y')),
+        if (orgstructure.name is null,'',orgstructure.name) as UCH,
+        if (addresshouse.number is null,'',addresshouse.number) as DOM,
+        if (addresshouse.corpus is null,'',addresshouse.corpus) as KOR,
+        if (address.flat is null,'',address.flat) as KV,
+        addresshouse.KLADRCode,
+        addresshouse.KLADRStreetCode
+        from  clientaddress
+        inner join client on clientaddress.client_id=client.id
+        inner join address on clientaddress.address_id=Address.id
+        inner join addresshouse on Address.house_id=addresshouse.id
+        inner join orgstructure_address on addresshouse.id=orgstructure_address.house_id
+        inner join orgstructure on orgstructure_address.master_id=orgstructure.id
+        where
+        Client.lastName is not null
+        and 	Client.firstName is not null
+        and 	Client.birthDate is not null;
+
+        select
+        tmp_res.client_id as ID ,
+        if (Organisation.infisCode is null,'',Organisation.infisCode) as SMO,
+        case Clientpolicy.policyKind_id
+        when '3' then 'П'
+        when '2' then 'С'
+        when '1' then 'В'
+        else ''
+        end as DPFS,
+        if (Clientpolicy.`serial` is null,'',Clientpolicy.`serial`) as DPFS_S,
+        if (Clientpolicy.number is null,'',Clientpolicy.number) as DPFS_N,
+        tmp_res.FAM as FAM,  tmp_res.IM as IM, tmp_res.OT as OT, tmp_res.DATR as DATR,
+        if (rbDocumentType.regionalCode is null,'',rbDocumentType.regionalCode) as DOC,
+        if (ClientDocument.`serial` is null,'',ClientDocument.`serial`) as DOC_S,
+        if (ClientDocument.number is null,'',ClientDocument.number) as DOC_N,
+        if (curorg.infisCode is null,'',curorg.infisCode) as CODE_MO,
+        if (clientattach.attachType_id is null,'0',clientattach.attachType_id) as PRIK,
+        if (clientattach.begDate is null,'',DATE_FORMAT(clientattach.begDate, '%d.%m.%Y')) as PRIK_D,
+        if (clientattach.endDate is null,'',DATE_FORMAT(clientattach.endDate, '%d.%m.%Y')) as OTKR_D,
+        tmp_res.UCH as UCH,
+        if (kldraion.name is null,'',kldraion.name) as R_NAME,
+        if (kldcity.name is null,'',kldcity.name) as C_NAME,
+        if (socrrkld.infisCODE is null,'0',socrrkld.infisCODE ) as Q_NP,
+        if (kld.NAME is null,'',kld.NAME) as NP_NAME,
+        if (socrrkldstr.infisCODE is null,'0',socrrkldstr.infisCODE) as Q_UL,
+        if (kldstr.NAME is null,'',kldstr.NAME) as UL_NAME,
+        tmp_res.DOM as DOM,
+        tmp_res.KOR as KOR,
+        tmp_res.KV as KV,
+        '' as SMORES,
+        '' as MIACRES
+
+        from tmp_res
+
+        left join Clientpolicy on tmp_res.client_id=Clientpolicy.client_id
+        and clientpolicy.id = (select id from clientpolicy where client_id=tmp_res.client_id order by id desc limit 1)
+        left join Organisation on Clientpolicy.insurer_id = Organisation.id
+        left join ClientDocument on tmp_res.client_id=ClientDocument.client_id
+        and ClientDocument.id  = (select id from ClientDocument where client_id=tmp_res.client_id order by id desc limit 1)
+        left join rbDocumentType on ClientDocument.documentType_id=rbDocumentType.id
+        left join Organisation as curorg on ( SELECT organisation_id FROM orgstructure WHERE parent_id IS NULL LIMIT 1 )=curorg.id
+        left join clientattach on tmp_res.client_id=clientattach.client_id
+        and clientattach.id  = (select id from clientattach where client_id=tmp_res.client_id order by id desc limit 1)
+        left join kladr.kladr as kld on tmp_res.KLADRCode=kld.CODE
+
+        left join kladr.street as kldstr on tmp_res.KLADRStreetCode=kldstr.CODE
+        left join kladr.socrbase as socrrkld on kld.SOCR=socrrkld.SCNAME
+        left join kladr.socrbase as socrrkldstr on kldstr.SOCR=socrrkldstr.SCNAME
+        left join kladr.kladr as kldraion on concat(substring(kld.CODE,1,5),'00000000')=kldraion.CODE
+        left join kladr.kladr as kldcity on concat(substring(kld.CODE,1,8),'00000')=kldcity.CODE
+        where
+        Clientpolicy.number is not null
+        group by tmp_res.client_id;
+        end
+    </export_proc>
 </root>
