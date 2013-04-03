@@ -1,0 +1,10 @@
+('f:\\OsSystems\\krd\\ExportR23PN\\dist\\main.exe',
+ False,
+ False,
+ None,
+ None,
+ [],
+ None,
+ True,
+ 0,
+ 1364469630L)

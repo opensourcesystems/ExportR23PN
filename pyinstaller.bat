@@ -1,0 +1,1 @@
+f:\Python26\python.exe f:\pyinstaller-2.0\pyinstaller.py -F -p f:\Python26\Lib\site-packages -w  f:\OsSystems\krd\ExportR23PN\main.py

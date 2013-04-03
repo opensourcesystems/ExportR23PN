@@ -1,0 +1,12 @@
+<?xml version="1.0" ?><root>
+	<dbfschema>
+		<fam>FAM</fam>
+		<im>IM</im>
+		<ot>OT</ot>
+		<dr>DATR</dr>
+	</dbfschema>
+	<connections>
+		<samson db="s11_skibn" ip="127.0.0.1" login="root" password="Qwedsa1!"/>
+		<smo_infis/>
+	</connections>
+</root>
