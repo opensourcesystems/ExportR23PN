@@ -1,6 +1,6 @@
-<?xml version="1.0" ?><root>
+﻿<?xml version="1.0" encoding="utf-8"?><root>
 	<connections>
-		<samson db="s11_skibn" ip="127.0.0.1" login="root" password="Qwedsa1!"/>
+		<samson db="s11_skib" ip="127.0.0.1" login="root" password="Qwedsa1!"/>
 		<smo_infis/>
 	</connections>
     <export_proc>
@@ -24,7 +24,6 @@
 
         insert into tmp_res
         SELECT
-        -- count(client.id)
         client.id,Client.lastName,Client.firstName,Client.patrName,
         if (Client.birthDate is null,'',DATE_FORMAT(Client.birthDate, '%d.%m.%Y')),
         if (orgstructure.name is null,'',orgstructure.name) as UCH,
@@ -33,14 +32,15 @@
         if (address.flat is null,'',address.flat) as KV,
         addresshouse.KLADRCode,
         addresshouse.KLADRStreetCode
-        from  clientaddress
-        inner join client on clientaddress.client_id=client.id
-        inner join address on clientaddress.address_id=Address.id
+        from  clientaddress as t1
+        inner join client on t1.client_id=client.id
+        inner join address on t1.address_id=Address.id
         inner join addresshouse on Address.house_id=addresshouse.id
         inner join orgstructure_address on addresshouse.id=orgstructure_address.house_id
         inner join orgstructure on orgstructure_address.master_id=orgstructure.id
         where
-        Client.lastName is not null
+        t1.type like  if( (select count(t2.id) from clientaddress as t2 where t2.client_id=t1.client_id)=2  ,'1','%')
+        and Client.lastName is not null
         and 	Client.firstName is not null
         and 	Client.birthDate is not null;
 
@@ -48,9 +48,9 @@
         tmp_res.client_id as ID ,
         if (Organisation.infisCode is null,'',Organisation.infisCode) as SMO,
         case Clientpolicy.policyKind_id
-        when '3' then 'П'
-        when '2' then 'С'
-        when '1' then 'В'
+         when '3' then 'П'
+		 when '2' then 'С'
+		 when '1' then 'В'
         else ''
         end as DPFS,
         if (Clientpolicy.`serial` is null,'',Clientpolicy.`serial`) as DPFS_S,
@@ -97,6 +97,7 @@
         where
         Clientpolicy.number is not null
         group by tmp_res.client_id;
-        end
+        end;
+        COMMIT;
     </export_proc>
 </root>
