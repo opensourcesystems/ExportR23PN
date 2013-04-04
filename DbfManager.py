@@ -6,7 +6,15 @@ import os
 class DbfManager:
     def createRecord(self,data):
         dbfRecord = self.dbf.newRecord()
-        for fieldname in dbfRecord.dbf.fieldNames: dbfRecord[fieldname]= data[fieldname]
+        vnt=0
+        for fieldname in dbfRecord.dbf.fieldNames:
+            typecod=dbfRecord.dbf.fieldDefs[vnt].typeCode
+            # if typecod=='C':
+            #      dbfRecord[fieldname]=data[fieldname].decode('cp1251')
+            # else:
+            dbfRecord[fieldname]= data[fieldname]
+            vnt+=1
+
         dbfRecord.store()
     def closedbf(self):
         self.dbf.close()
