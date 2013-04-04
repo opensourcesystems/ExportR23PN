@@ -85,7 +85,13 @@ class CImportPN(QtGui.QDialog, Ui_Dialog):
             return
         samsmgr=SamsonManager()
         #dirname, filename = os.path.split(os.path.abspath(path))
+        item = QtGui.QListWidgetItem(u'Работаю ждите............')
+        self.listWidget.addItem(item)
+        QtGui.qApp.processEvents()
         samsmgr.ExportPN(self.progressBar,path)
+        item = QtGui.QListWidgetItem(u'Готово!!')
+        self.listWidget.addItem(item)
+        QtGui.qApp.processEvents()
         #samsmgr.ManageRawKmivcData(KmivcManager.Getrawkmivcdata(),self.tableWidget,self.progressBar)
         # for i in range(5):
         #     self.tableWidget.setItem(1, i, QtGui.QTableWidgetItem('G'))
