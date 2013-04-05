@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><root>
+﻿<?xml version="1.0" encoding="utf-8"?><root>
 	<connections>
 		<samson db="s11_tst" ip="192.168.1.3" login="devel" password="Qwedsa1!"/>
 		<smo_infis/>
@@ -27,7 +27,7 @@
         SELECT
         Client.id,Client.lastName,Client.firstName,Client.patrName,
         if (Client.birthDate is null,'',DATE_FORMAT(Client.birthDate, '%d.%m.%Y')),
-        if (OrgStructure.name is null,'',OrgStructure.name) as UCH,
+        if (OrgStructure.infisCode is null,'',OrgStructure.infisCode) as UCH,
         if (AddressHouse.number is null,'',AddressHouse.number) as DOM,
         if (AddressHouse.corpus is null,'',AddressHouse.corpus) as KOR,
         if (Address.flat is null,'',Address.flat) as KV,
@@ -43,7 +43,9 @@
         t1.type like  if( (select count(t2.id) from ClientAddress as t2 where t2.client_id=t1.client_id)=2  ,'1','%')
         and Client.lastName is not null
         and 	Client.firstName is not null
-        and 	Client.birthDate is not null;
+        and 	Client.birthDate is not null
+		and AddressHouse.KLADRCode <>''
+        and AddressHouse.KLADRStreetCode <> '';
 
         select
         tmp_res.client_id as ID ,
