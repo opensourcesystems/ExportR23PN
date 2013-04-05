@@ -53,6 +53,7 @@ class CImportPN(QtGui.QDialog, Ui_Dialog):
             QtGui.QMessageBox.information(None,'Warning',u'Выберите dbf файл',QtGui.QMessageBox.Ok)
         smgr=SamsonManager()
         smgr.splitbySMO(self.miacreturned)
+        pass
 
     def on_samsonadr_changed(self,txt):
         ConnectionsManager.samsonconn['ip']=str(txt)
