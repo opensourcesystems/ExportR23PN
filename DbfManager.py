@@ -81,4 +81,17 @@ class DbfManager:
             self.closedbf()
             self.CreateZip(npath)
         a='dfdf'
-
+    @staticmethod
+    def loadSprs():
+        spr_dir=os.path.join(os.getcwd(),'Spr')
+        spr44=os.path.join(spr_dir, 'SPR44.DBF')
+        spr45=os.path.join(spr_dir, 'SPR45.DBF')
+        dbf44 = Dbf(spr44, readOnly=True, encoding='cp866')
+        dbf45 = Dbf(spr45, readOnly=True, encoding='cp866')
+        dataspr44={}
+        dataspr45={}
+        for row in dbf44:
+            dataspr44[row['CODE']]=row['NAME']
+        for row in dbf45:
+            dataspr45[row['CODE']]=row['NAME']
+        return [dataspr44,dataspr45]

@@ -17,9 +17,22 @@ def recursion_cnt(fn):
 
 class SamsonDBManager:
 
+    def updatekladr(self,listspr):
+        for spr in listspr:
+            for row in spr:
+                query=DBManager.executeSql(u"""select KOD_T_ST from kladr.SOCRBASE where SOCRNAME='{0}' and infisCode='{1}'""".format(spr[row],row))
+                if len(query)>0:
+                    continue
+                else:
+                    query=DBManager.executeSqlNonQuery(u"""update kladr.SOCRBASE set infisCode='{1}' where SOCRNAME='{0}'""".format(spr[row],row))
+
+
+
+
+
     def getdata(self):
         #stmt=TextFileLoader.load()
-
+        DBManager.executeSqlNonQuery(u"""drop procedure if exists `ExportR23PN_proc`;""")
         DBManager.executeSqlNonQuery(ConnectionsManager.samsonconn['export_proc'])
         query =DBManager.executeproc()
 

@@ -88,6 +88,10 @@ class CImportPN(QtGui.QDialog, Ui_Dialog):
         item = QtGui.QListWidgetItem(u'Работаю ждите............')
         self.listWidget.addItem(item)
         QtGui.qApp.processEvents()
+        samsmgr.updatekladr()
+
+
+
         samsmgr.ExportPN(self.progressBar,path)
         item = QtGui.QListWidgetItem(u'Готово!!')
         self.listWidget.addItem(item)

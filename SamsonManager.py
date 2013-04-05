@@ -33,6 +33,9 @@ class SamsonManager:
             row['IDSTR']=cnt
             row['DATR']=datetime.datetime.strptime(row['DATR'], '%d.%m.%Y')
             row['ID']=int(row['ID'])
+            if row['Q_UL'] ==u'' or row['Q_NP']==u'':
+                QtGui.QMessageBox.information(None,'Warning',u'В кладр не заполнено поле infisCode таблицы SOCRBASE, загрузите справочники spr44, spr45',QtGui.QMessageBox.Ok)
+                return None
             row['Q_UL']=int(row['Q_UL'])
             row['Q_NP']=int(row['Q_NP'])
             row['PRIK_D']='' if row['PRIK_D'] ==u'' else datetime.datetime.strptime(row['PRIK_D'], '%d.%m.%Y') #row['PRIK_D']
@@ -68,6 +71,11 @@ class SamsonManager:
    def splitbySMO(self,path):
        sdbf=DbfManager()
        sdbf.LoadDbf(path)
+   def updatekladr(self):
+
+       mgr=SamsonDBManager()
+
+       mgr.updatekladr(DbfManager.loadSprs())
 
 
 

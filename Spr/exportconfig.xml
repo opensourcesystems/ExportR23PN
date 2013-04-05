@@ -1,10 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?><root>
+<?xml version="1.0" encoding="utf-8"?><root>
 	<connections>
 		<samson db="s11_tst" ip="192.168.1.3" login="devel" password="Qwedsa1!"/>
 		<smo_infis/>
 	</connections>
     <export_proc>
-        create procedure `ImportR23PN_proc` ()
+        create procedure `ExportR23PN_proc` ()
         begin
         SET NAMES 'utf8' COLLATE utf8_general_ci;
         SET CHARACTER SET 'utf8';
@@ -44,8 +44,8 @@
         and Client.lastName is not null
         and 	Client.firstName is not null
         and 	Client.birthDate is not null
-		and AddressHouse.KLADRCode <>''
-        and AddressHouse.KLADRStreetCode <> '';
+		and AddressHouse.KLADRCode !=''
+        and AddressHouse.KLADRStreetCode != '';
 
         select
         tmp_res.client_id as ID ,
@@ -99,6 +99,8 @@
         left join kladr.KLADR as kldcity on concat(substring(kld.CODE,1,8),'00000')=kldcity.CODE
         where
         ClientPolicy.number is not null
+		and socrrkldstr.infisCODE!=''
+		and socrrkld.infisCODE!=''
         group by tmp_res.client_id;
         end;
         COMMIT;

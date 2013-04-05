@@ -9,7 +9,7 @@ class DBManager:
     @staticmethod
     def executeSqlNonQuery(command):
         db = MySQLdb.connect(host=ConnectionsManager.samsonconn['ip'], user=ConnectionsManager.samsonconn['login'],
-                             passwd=ConnectionsManager.samsonconn['password'], db=ConnectionsManager.samsonconn['db'], charset='utf8')
+                             passwd=ConnectionsManager.samsonconn['password'], db=ConnectionsManager.samsonconn['db'], charset='utf8',use_unicode=True)
         # формируем курсор, с помощью которого можно исполнять SQL-запросы
 
 
@@ -33,10 +33,10 @@ class DBManager:
     @staticmethod
     def executeproc():
         db = MySQLdb.connect(host=ConnectionsManager.samsonconn['ip'], user=ConnectionsManager.samsonconn['login'],
-                             passwd=ConnectionsManager.samsonconn['password'], db=ConnectionsManager.samsonconn['db'], charset='utf8',
+                             passwd=ConnectionsManager.samsonconn['password'], db=ConnectionsManager.samsonconn['db'], charset='utf8',use_unicode=True,
                              cursorclass=MySQLdb.cursors.DictCursor)
         cursor = db.cursor()
-        proc=cursor.callproc( "ImportR23PN_proc", () )
+        proc=cursor.callproc( "ExportR23PN_proc", () )
         result=cursor.fetchall()
 
         cursor.close()
@@ -48,7 +48,7 @@ class DBManager:
     @staticmethod
     def executeSql(command):
         db = MySQLdb.connect(host=ConnectionsManager.samsonconn['ip'], user=ConnectionsManager.samsonconn['login'],
-                             passwd=ConnectionsManager.samsonconn['password'], db=ConnectionsManager.samsonconn['db'], charset='utf8',
+                             passwd=ConnectionsManager.samsonconn['password'], db=ConnectionsManager.samsonconn['db'], charset='utf8',use_unicode=True,
                              cursorclass=MySQLdb.cursors.DictCursor)
         cursor = db.cursor()
         cursor.execute(command)
